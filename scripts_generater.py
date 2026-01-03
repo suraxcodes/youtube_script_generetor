@@ -167,8 +167,8 @@ Guidelines:
             start = response.find('{')
             end = response.rfind('}')
             if start != -1 and end != 0:
-                jso_str = response[start:end]
-                return json.load(jso_str)
+                jso_str = response[start:end+1]
+                return json.loads(jso_str)
             else :
                 return self._create_fall_script(topic)
         except Exception as e:
@@ -223,15 +223,19 @@ class YouTubeScriptPipeline:
     
 
 def main():
-    pipeline = YouTubeScriptPipeline()
-    topic = "The History of the Internet"
-    result = pipeline.generate(topic)
+    st.title("YouTube Script Generator using Local LLM")
+    topic = st.text_input("Enter the topic for the YouTube script:")
 
-    print("=== YouTube Script Pipeline Output ===")
-    print(f"Topic: {result['topic']}")
-    print(f"Research: {result['research'][:200]}...")  # preview
-    print(f"Script: {result['script'][:200]}...")      # preview
-
-
+    if st.button("Generate Script"):
+        if topic:
+            pipeline = YouTubeScriptPipeline()
+            with st.spinner("Generating script..."):
+                result = pipeline.generate(topic)
+            st.success("Script Generated!")
+            st.subheader("Generated Script:")
+            st.json(result["script"])
+        else:
+            st.error("Please enter a topic.")
+           
 if __name__ == "__main__":
     main()
